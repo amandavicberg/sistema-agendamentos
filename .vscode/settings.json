@@ -1,0 +1,14 @@
+{
+  "dotnet.defaultSolution": "SistemaAgendamentos.Api.sln",
+
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  }
+}
