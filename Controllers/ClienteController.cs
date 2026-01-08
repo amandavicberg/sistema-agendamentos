@@ -18,48 +18,54 @@ public class ClienteController : ControllerBase
   }
 
   [HttpGet]
-  public IActionResult<List<Cliente>> GetAll()
+  public IActionResult GetAll()
   {
-    var clientes = _clienteService.Listar();
+    var clientes = _clienteService.GetAll();
     return Ok(clientes);
   }
 
-  [HttpPut("{id:guid}")]
-  public IActionResult GetById(Guid id, [FromBody] UpdateClienteDto dto)
+  [HttpGet("{id:guid}")]
+  public IActionResult GetById(Guid id)
   {
-    if (!ModelState.IsValid)
-      return BadRequest(ModelState);
+    var cliente = _clienteService.GetById(id);
 
-    dto.Id = id;
-
-    var cliente = _clienteService.Update(dto);
-
-    if (cliente is null)
+    if (cliente == null)
       return NotFound();
 
     return Ok(cliente);
   }
 
   [HttpPost]
-  public ActionResult<Cliente> Criar([FromBody] CreateClienteDto dto)
+  public IActionResult Create([FromBody] CreateClienteDto dto)
   {
     if (!ModelState.IsValid)
       return BadRequest(ModelState);
 
-    var cliente = _clienteService.Criar(dto);
+    var cliente = _clienteService.Create(dto);
 
-    return CreatedAtAction(nameof(Criar), new { id = cliente.Id }, cliente);
+    return CreatedAtAction(nameof(GetById), new { id = cliente.Id }, cliente);
+  }
+
+  [HttpPut]
+  public IActionResult Update([FromBody] UpdateClienteDto dto)
+  {
+    if (!ModelState.IsValid)
+      return BadRequest(ModelState);
+
+    var cliente = _clienteService.Update(dto);
+
+    if (cliente == null)
+      return NotFound();
+
+    return Ok(cliente);
   }
 
   [HttpDelete("{id:guid}")]
-  public ActionResult Delete(Guid id)
+  public IActionResult Delete(Guid id)
   {
-    if (!ModelState.isValid)
-      return BadRequest(ModelState);
-
     var removido = _clienteService.Delete(id);
 
-    if(!removido)
+    if (!removido)
       return NotFound();
 
     return NoContent();
