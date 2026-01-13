@@ -38,7 +38,7 @@ public class ServicoService
     return servico == null ? null : MapToResponse(servico);
   }
 
-  public ServicoResponseDto Update(UpdateServicoDto dto)
+  public ServicoResponseDto? Update(UpdateServicoDto dto)
   {
     var servico = _servicos.FirstOrDefault(s => s.Id == dto.Id);
 

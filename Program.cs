@@ -8,6 +8,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<ClienteService>();
 builder.Services.AddScoped<ServicoService>();
+builder.Services.AddScoped<AgendamentoService>();
 
 var app = builder.Build();
 
