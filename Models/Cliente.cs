@@ -7,10 +7,4 @@ public class Cliente
   public string Email { get; set; } = string.Empty;
   public string Telefone { get; set; } = string.Empty;
   public DateTime CreatedAt { get; set; }
-
-  public Cliente()
-  {
-    Id = Guid.NewGuid();
-    CreatedAt = DateTime.UtcNow;
-  }
 }

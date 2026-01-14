@@ -3,16 +3,22 @@ using SistemaAgendamentos.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SistemaAgendamentos.Api.Data;
 
 namespace SistemaAgendamentos.Api.Service;
 
 public class ServicoService
 {
-  private static readonly List<Servico> _servicos = new();
+  private readonly AppDbContext _context;
+
+  public ServicoService(AppDbContext context)
+  {
+    _context = context;
+  }
 
   public List<ServicoResponseDto> GetAll()
   {
-    return _servicos.Select(MapToResponse).ToList();
+    return _context.Servicos.Select(MapToResponse).ToList();
   }
 
   public ServicoResponseDto Create(CreateServicoDto dto)
@@ -26,21 +32,22 @@ public class ServicoService
       CreatedAt = DateTime.UtcNow
     };
 
-    _servicos.Add(servico);
+    _context.Servicos.Add(servico);
+    _context.SaveChanges();
 
     return MapToResponse(servico);
   }
 
   public ServicoResponseDto? GetById(Guid id)
   {
-    var servico = _servicos.FirstOrDefault(s => s.Id == id);
+    var servico = _context.Servicos.FirstOrDefault(s => s.Id == id);
 
     return servico == null ? null : MapToResponse(servico);
   }
 
   public ServicoResponseDto? Update(UpdateServicoDto dto)
   {
-    var servico = _servicos.FirstOrDefault(s => s.Id == dto.Id);
+    var servico = _context.Servicos.FirstOrDefault(s => s.Id == dto.Id);
 
     if (servico == null)
       return null;
@@ -54,12 +61,12 @@ public class ServicoService
 
   public bool Delete(Guid id)
   {
-    var servico = _servicos.FirstOrDefault(s => s.Id == id);
+    var servico = _context.Servicos.FirstOrDefault(s => s.Id == id);
 
     if (servico == null)
       return false;
 
-    _servicos.Remove(servico);
+    _context.Servicos.Remove(servico);
     return true;
   }
 

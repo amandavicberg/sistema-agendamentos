@@ -3,16 +3,22 @@ using SistemaAgendamentos.Api.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SistemaAgendamentos.Api.Data;
 
 namespace SistemaAgendamentos.Api.Service;
 
 public class ClienteService
 {
-  private static readonly List<Cliente> _clientes = new();
+  private readonly AppDbContext _context;
+
+  public ClienteService(AppDbContext context)
+  {
+    _context = context;
+  }
 
   public List<ClienteResponseDto> GetAll()
   {
-    return _clientes.Select(MapToResponse).ToList();
+    return _context.Clientes.Select(MapToResponse).ToList();
   }
 
   public ClienteResponseDto Create(CreateClienteDto dto)
@@ -26,21 +32,22 @@ public class ClienteService
       CreatedAt = DateTime.UtcNow
     };
 
-    _clientes.Add(cliente);
+    _context.Clientes.Add(cliente);
+    _context.SaveChanges();
 
     return MapToResponse(cliente);
   }
 
   public ClienteResponseDto? GetById(Guid id)
   {
-    var cliente = _clientes.FirstOrDefault(c => c.Id == id);
+    var cliente = _context.Clientes.FirstOrDefault(c => c.Id == id);
 
     return cliente == null ? null : MapToResponse(cliente);
   }
 
   public ClienteResponseDto? Update(UpdateClienteDto dto)
   {
-    var cliente = _clientes.FirstOrDefault(c => c.Id == dto.Id);
+    var cliente = _context.Clientes.FirstOrDefault(c => c.Id == dto.Id);
 
     if (cliente == null)
       return null;
@@ -54,12 +61,12 @@ public class ClienteService
 
   public bool Delete(Guid id)
   {
-    var cliente = _clientes.FirstOrDefault(c => c.Id == id);
+    var cliente = _context.Clientes.FirstOrDefault(c => c.Id == id);
 
     if (cliente == null)
       return false;
 
-    _clientes.Remove(cliente);
+    _context.Clientes.Remove(cliente);
     return true;
   }
 

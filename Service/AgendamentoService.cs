@@ -4,16 +4,22 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SistemaAgendamentos.Api.Enums;
+using SistemaAgendamentos.Api.Data;
 
 namespace SistemaAgendamentos.Api.Service;
 
 public class AgendamentoService
 {
-  private static readonly List<Agendamento> _agendamentos = new();
+  private readonly AppDbContext _context;
+
+  public AgendamentoService(AppDbContext context)
+  {
+    _context = context;
+  }
 
   public List<AgendamentoResponseDto> GetAll()
   {
-    return _agendamentos.Select(MapToResponse).ToList();
+    return _context.Agendamentos.Select(MapToResponse).ToList();
   }
 
   public AgendamentoResponseDto Create(CreateAgendamentoDto dto)
@@ -28,21 +34,22 @@ public class AgendamentoService
       CreatedAt = DateTime.UtcNow
     };
 
-    _agendamentos.Add(agendamento);
+    _context.Agendamentos.Add(agendamento);
+    _context.SaveChanges();
 
     return MapToResponse(agendamento);
   }
 
   public AgendamentoResponseDto? GetById(Guid id)
   {
-    var agendamento = _agendamentos.FirstOrDefault(a => a.Id == id);
+    var agendamento = _context.Agendamentos.FirstOrDefault(a => a.Id == id);
 
     return agendamento == null ? null : MapToResponse(agendamento);
   }
 
   public AgendamentoResponseDto? Update(UpdateAgendamentoDto dto)
   {
-    var agendamento = _agendamentos.FirstOrDefault(a => a.Id == dto.Id);
+    var agendamento = _context.Agendamentos.FirstOrDefault(a => a.Id == dto.Id);
     if (agendamento == null)
       return null;
 
@@ -55,12 +62,12 @@ public class AgendamentoService
 
   public bool Delete(Guid id)
   {
-    var agendamento = _agendamentos.FirstOrDefault(a => a.Id == id);
+    var agendamento = _context.Agendamentos.FirstOrDefault(a => a.Id == id);
 
     if (agendamento == null)
       return false;
 
-    _agendamentos.Remove(agendamento);
+    _context.Agendamentos.Remove(agendamento);
     return true;
   }
 
