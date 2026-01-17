@@ -8,7 +8,6 @@ namespace SistemaAgendamentos.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-
 public class AgendamentoController : ControllerBase
 {
   private readonly AgendamentoService _agendamentoService;
@@ -19,17 +18,16 @@ public class AgendamentoController : ControllerBase
   }
 
   [HttpGet]
-  public IActionResult GetAll()
+  public async Task<IActionResult> GetAll()
   {
-    var agendamentos = _agendamentoService.GetAll();
+    var agendamentos = await _agendamentoService.GetAllAsync();
     return Ok(agendamentos);
   }
 
   [HttpGet("{id:guid}")]
-  public IActionResult GetById(Guid id)
+  public async Task<IActionResult> GetById(Guid id)
   {
-    var agendamento = _agendamentoService.GetById(id);
-
+    var agendamento = await _agendamentoService.GetByIdAsync(id);
     if (agendamento == null)
       return NotFound();
 
@@ -37,24 +35,33 @@ public class AgendamentoController : ControllerBase
   }
 
   [HttpPost]
-  public IActionResult Create([FromBody] CreateAgendamentoDto dto)
+  public async Task<IActionResult> Create([FromBody] CreateAgendamentoDto dto)
   {
     if (!ModelState.IsValid)
       return BadRequest(ModelState);
 
-    var agendamento = _agendamentoService.Create(dto);
-
-    return CreatedAtAction(nameof(GetById), new { id = agendamento.Id }, agendamento);
+    try
+    {
+      var agendamento = await _agendamentoService.CreateAsync(dto);
+      return CreatedAtAction(nameof(GetById), new { id = agendamento.Id }, agendamento);
+    }
+    catch (ArgumentException ex)
+    {
+      return BadRequest(new { message = ex.Message });
+    }
+    catch (InvalidOperationException ex)
+    {
+      return Conflict(new { message = ex.Message });
+    }
   }
 
   [HttpPut]
-  public IActionResult Update([FromBody] UpdateAgendamentoDto dto)
+  public async Task<IActionResult> Update([FromBody] UpdateAgendamentoDto dto)
   {
     if (!ModelState.IsValid)
       return BadRequest(ModelState);
 
-    var agendamento = _agendamentoService.Update(dto);
-
+    var agendamento = await _agendamentoService.UpdateAsync(dto);
     if (agendamento == null)
       return NotFound();
 
@@ -62,10 +69,9 @@ public class AgendamentoController : ControllerBase
   }
 
   [HttpDelete("{id:guid}")]
-  public IActionResult Delete(Guid id)
+  public async Task<IActionResult> Delete(Guid id)
   {
-    var removido = _agendamentoService.Delete(id);
-
+    var removido = await _agendamentoService.DeleteAsync(id);
     if (!removido)
       return NotFound();
 

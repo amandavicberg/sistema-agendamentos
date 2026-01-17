@@ -5,8 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using SistemaAgendamentos.Api.Enums;
 using SistemaAgendamentos.Api.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace SistemaAgendamentos.Api.Service;
+
+using Microsoft.EntityFrameworkCore;
 
 public class AgendamentoService
 {
@@ -17,13 +20,37 @@ public class AgendamentoService
     _context = context;
   }
 
-  public List<AgendamentoResponseDto> GetAll()
+  public async Task<List<AgendamentoResponseDto>> GetAllAsync()
   {
-    return _context.Agendamentos.Select(MapToResponse).ToList();
+    var agendamentos = await _context.Agendamentos.ToListAsync();
+    return agendamentos.Select(MapToResponse).ToList();
   }
 
-  public AgendamentoResponseDto Create(CreateAgendamentoDto dto)
+
+  public async Task<AgendamentoResponseDto?> GetByIdAsync(Guid id)
   {
+    var agendamento = await _context.Agendamentos.FirstOrDefaultAsync(a => a.Id == id);
+    return agendamento == null ? null : MapToResponse(agendamento);
+  }
+
+
+  public async Task<AgendamentoResponseDto> CreateAsync(CreateAgendamentoDto dto)
+  {
+    var clienteExiste = await _context.Clientes.AnyAsync(c => c.Id == dto.ClienteId);
+    if (!clienteExiste)
+      throw new ArgumentException("Cliente não encontrado.");
+
+    var servicoExiste = await _context.Servicos.AnyAsync(s => s.Id == dto.ServicoId);
+    if (!servicoExiste)
+      throw new ArgumentException("Serviço não encontrado.");
+
+    var conflito = await _context.Agendamentos
+      .AnyAsync(a => a.DataHora == dto.DataHora
+                  && a.Status != StatusAgendamento.Cancelado);
+
+    if (conflito)
+      throw new InvalidOperationException("Já existe um agendamento para este horário.");
+
     var agendamento = new Agendamento
     {
       Id = Guid.NewGuid(),
@@ -35,39 +62,32 @@ public class AgendamentoService
     };
 
     _context.Agendamentos.Add(agendamento);
-    _context.SaveChanges();
+    await _context.SaveChangesAsync();
 
     return MapToResponse(agendamento);
   }
 
-  public AgendamentoResponseDto? GetById(Guid id)
+  public async Task<AgendamentoResponseDto?> UpdateAsync(UpdateAgendamentoDto dto)
   {
-    var agendamento = _context.Agendamentos.FirstOrDefault(a => a.Id == id);
-
-    return agendamento == null ? null : MapToResponse(agendamento);
-  }
-
-  public AgendamentoResponseDto? Update(UpdateAgendamentoDto dto)
-  {
-    var agendamento = _context.Agendamentos.FirstOrDefault(a => a.Id == dto.Id);
+    var agendamento = await _context.Agendamentos.FirstOrDefaultAsync(a => a.Id == dto.Id);
     if (agendamento == null)
       return null;
 
     agendamento.DataHora = dto.DataHora;
     agendamento.Status = dto.Status;
 
+    await _context.SaveChangesAsync();
     return MapToResponse(agendamento);
   }
 
-
-  public bool Delete(Guid id)
+  public async Task<bool> DeleteAsync(Guid id)
   {
-    var agendamento = _context.Agendamentos.FirstOrDefault(a => a.Id == id);
-
+    var agendamento = await _context.Agendamentos.FirstOrDefaultAsync(a => a.Id == id);
     if (agendamento == null)
       return false;
 
     _context.Agendamentos.Remove(agendamento);
+    await _context.SaveChangesAsync();
     return true;
   }
 
