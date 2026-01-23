@@ -25,7 +25,9 @@ namespace SistemaAgendamentos.Api.Controllers
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginDto dto)
     {
-      var result = await _authService.LoginAsync(dto);
+      var result = await _authService.Login(dto);
+      if (result == null) return Unauthorized("Email ou senha inválidos");
+
       return Ok(result);
     }
   }

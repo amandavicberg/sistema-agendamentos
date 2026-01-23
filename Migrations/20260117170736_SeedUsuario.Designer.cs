@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaAgendamentos.Api.Data;
 
@@ -11,9 +12,11 @@ using SistemaAgendamentos.Api.Data;
 namespace SistemaAgendamentos.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260117170736_SeedUsuario")]
+    partial class SeedUsuario
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,7 +142,7 @@ namespace SistemaAgendamentos.Api.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2026, 1, 17, 17, 59, 25, 285, DateTimeKind.Utc).AddTicks(2610),
+                            CreatedAt = new DateTime(2026, 1, 17, 17, 7, 35, 696, DateTimeKind.Utc).AddTicks(4460),
                             Email = "admin@diva.com",
                             Nome = "Admin Diva",
                             PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",

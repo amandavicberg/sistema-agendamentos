@@ -45,6 +45,18 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
+builder.Services.AddCors(options =>
+{
+  options.AddDefaultPolicy(policy =>
+  {
+    policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+  });
+});
+
+app.UseCors();
+
 // Pipeline
 app.UseSwagger();
 app.UseSwaggerUI();

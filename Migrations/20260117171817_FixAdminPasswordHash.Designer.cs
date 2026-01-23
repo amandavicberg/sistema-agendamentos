@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SistemaAgendamentos.Api.Data;
 
@@ -11,9 +12,11 @@ using SistemaAgendamentos.Api.Data;
 namespace SistemaAgendamentos.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260117171817_FixAdminPasswordHash")]
+    partial class FixAdminPasswordHash
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -139,10 +142,10 @@ namespace SistemaAgendamentos.Api.Migrations
                         new
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
-                            CreatedAt = new DateTime(2026, 1, 17, 17, 59, 25, 285, DateTimeKind.Utc).AddTicks(2610),
+                            CreatedAt = new DateTime(2026, 1, 17, 17, 18, 17, 202, DateTimeKind.Utc).AddTicks(7160),
                             Email = "admin@diva.com",
                             Nome = "Admin Diva",
-                            PasswordHash = "jZae727K08KaOmKSgOaGzww/XVqGr/PKEgIMkjrcbJI=",
+                            PasswordHash = "$2a$11$fQLVxWC9GkWvq7MM/jnzm.0OptTkZNGwuKiToNH.xhnZkTXuTLu42",
                             Role = "User"
                         });
                 });

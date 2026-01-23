@@ -7,6 +7,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using BCrypt.Net;
+using SistemaAgendamentos.Api.Helpers;
 
 namespace SistemaAgendamentos.Api.Service
 {
@@ -42,13 +43,20 @@ namespace SistemaAgendamentos.Api.Service
       return GenerateToken(usuario);
     }
 
-    public async Task<AuthResponseDto> LoginAsync(LoginDto dto)
+    public async Task<AuthResponseDto?> Login(LoginDto dto)
     {
-      var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == dto.Email);
-      if (usuario == null || !BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
-        throw new Exception("Credenciais inválidas.");
+      var passwordHash = PasswordHelper.Hash(dto.Password);
 
-      return GenerateToken(usuario);
+      var usuario = await _context.Usuarios
+          .FirstOrDefaultAsync(u => u.Email == dto.Email && u.PasswordHash == passwordHash);
+
+      if (usuario == null) return null;
+
+      return new AuthResponseDto
+      {
+        Token = "token-fake-por-enquanto",
+        Email = usuario.Email
+      };
     }
 
     private AuthResponseDto GenerateToken(Usuario usuario)

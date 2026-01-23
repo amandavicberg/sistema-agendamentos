@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using SistemaAgendamentos.Api.Models;
+using System.Security.Cryptography;
+using System.Text;
+using SistemaAgendamentos.Api.Helpers;
 
 namespace SistemaAgendamentos.Api.Data;
 
@@ -15,10 +18,11 @@ public class AppDbContext : DbContext
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+    base.OnModelCreating(modelBuilder);
+
     modelBuilder.Entity<Cliente>(entity =>
     {
       entity.HasKey(c => c.Id);
-
       entity.Property(c => c.Nome).IsRequired().HasMaxLength(150);
       entity.Property(c => c.Email).IsRequired().HasMaxLength(150);
       entity.Property(c => c.Telefone).IsRequired().HasMaxLength(20);
@@ -27,7 +31,6 @@ public class AppDbContext : DbContext
     modelBuilder.Entity<Servico>(entity =>
     {
       entity.HasKey(s => s.Id);
-
       entity.Property(s => s.Nome).IsRequired().HasMaxLength(150);
       entity.Property(s => s.Preco).HasColumnType("decimal(10,2)");
       entity.Property(s => s.DuracaoMinutos).IsRequired();
@@ -50,6 +53,17 @@ public class AppDbContext : DbContext
       entity.Property(a => a.Status)
             .HasConversion<int>()
             .IsRequired();
+    });
+
+    var usuarioId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+
+    modelBuilder.Entity<Usuario>().HasData(new Usuario
+    {
+      Id = usuarioId,
+      Nome = "Admin Diva",
+      Email = "admin@diva.com",
+      PasswordHash = PasswordHelper.Hash("123456"),
+      CreatedAt = DateTime.UtcNow
     });
   }
 }
