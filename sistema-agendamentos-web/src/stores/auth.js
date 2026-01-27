@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import api from "@/api/http";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -9,15 +8,17 @@ export const useAuthStore = defineStore("auth", {
 
   actions: {
     async login(email, password) {
-      const { data } = await api.post("/auth/login", {
-        email,
-        password
-      });
+      // LOGIN FAKE DEV MODE
+      console.log("Tentando login fake:", email, password); // <--- debug
+      if (email === "admin@bergamasco.com" && password === "123456") {
+        this.token = "fake-jwt-token";
+        this.email = email;
+        localStorage.setItem("token", this.token);
+        localStorage.setItem("email", email);
+        return;
+      }
 
-      this.token = data.token;
-      this.email = data.email;
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("email", data.email);
+      throw new Error("Email ou senha inválidos");
     },
 
     logout() {
@@ -27,4 +28,3 @@ export const useAuthStore = defineStore("auth", {
     }
   }
 });
-

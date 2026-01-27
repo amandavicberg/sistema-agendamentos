@@ -45,18 +45,17 @@ namespace SistemaAgendamentos.Api.Service
 
     public async Task<AuthResponseDto?> Login(LoginDto dto)
     {
-      var passwordHash = PasswordHelper.Hash(dto.Password);
-
       var usuario = await _context.Usuarios
-          .FirstOrDefaultAsync(u => u.Email == dto.Email && u.PasswordHash == passwordHash);
+          .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
       if (usuario == null) return null;
 
-      return new AuthResponseDto
-      {
-        Token = "token-fake-por-enquanto",
-        Email = usuario.Email
-      };
+      // Verifica se a senha bate com o hash
+      if (!BCrypt.Net.BCrypt.Verify(dto.Password, usuario.PasswordHash))
+        return null;
+
+      // Gera token de verdade
+      return GenerateToken(usuario);
     }
 
     private AuthResponseDto GenerateToken(Usuario usuario)

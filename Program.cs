@@ -8,7 +8,7 @@ using System.Text;
 // Cria o builder primeiro
 var builder = WebApplication.CreateBuilder(args);
 
-// Pega a chave depois
+// Pega a chave
 var key = builder.Configuration["Jwt:Key"];
 
 // Configura autenticação
@@ -31,6 +31,17 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+// **CORS antes do Build**
+builder.Services.AddCors(options =>
+{
+  options.AddDefaultPolicy(policy =>
+  {
+    policy.AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+  });
+});
+
 // Services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -45,19 +56,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var app = builder.Build();
 
-builder.Services.AddCors(options =>
-{
-  options.AddDefaultPolicy(policy =>
-  {
-    policy.AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-  });
-});
-
+// Middleware
 app.UseCors();
 
-// Pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
 app.UseAuthentication();
