@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import api from "@/api/http";
+import { useUserStore } from "./user";
 
 export const useAuthStore = defineStore("auth", {
   state: () => ({
@@ -8,23 +10,39 @@ export const useAuthStore = defineStore("auth", {
 
   actions: {
     async login(email, password) {
-      // LOGIN FAKE DEV MODE
-      console.log("Tentando login fake:", email, password); // <--- debug
-      if (email === "admin@bergamasco.com" && password === "123456") {
-        this.token = "fake-jwt-token";
-        this.email = email;
-        localStorage.setItem("token", this.token);
-        localStorage.setItem("email", email);
-        return;
-      }
+      const { data } = await api.post("/auth/login", {
+        email,
+        password,
+      });
 
-      throw new Error("Email ou senha inválidos");
+      this.token = data.token;
+      this.email = data.email;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("email", data.email);
+
+      const userStore = useUserStore();
+      await userStore.fetchProfile();
+    },
+
+    async register(payload) {
+      const { data } = await api.post("/auth/register", payload);
+
+      this.token = data.token;
+      this.email = data.email;
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("email", data.email);
+
+      const userStore = useUserStore();
+      await userStore.fetchProfile();
     },
 
     logout() {
       this.token = null;
       this.email = null;
       localStorage.clear();
-    }
-  }
+
+      const userStore = useUserStore();
+      userStore.clear();
+    },
+  },
 });

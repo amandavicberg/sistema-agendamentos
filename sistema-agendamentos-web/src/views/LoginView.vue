@@ -1,66 +1,50 @@
-<script setup>
-import { useAuthStore } from "@/stores/auth";
-import { ref } from "vue";
-import { useRouter } from "vue-router";
-
-const email = ref("");
-const password = ref("");
-const auth = useAuthStore();
-const router = useRouter();
-const loading = ref(false);
-const errorMessage = ref("");
-
-async function handleLogin() {
-  loading.value = true;
-  errorMessage.value = "";
-  try {
-    await auth.login(email.value, password.value); // <-- deve chamar o store
-    router.push("/");
-  } catch (err) {
-    errorMessage.value = err.message; // vai mostrar "Email ou senha inválidos"
-  } finally {
-    loading.value = false;
-  }
-}
-
-</script>
-
 <template>
-  <div class="d-flex vh-100 justify-content-center align-items-center bg-light">
-    <div class="card shadow p-4 rounded-4" style="width: 380px">
-      <h3 class="text-center text-primary mb-4">Sistema de Agendamentos 💅</h3>
-
-      <input
-        v-model="email"
-        type="email"
-        class="form-control mb-3"
-        placeholder="Email"
-      />
-
-      <input
-        v-model="password"
-        type="password"
-        class="form-control mb-3"
-        placeholder="Senha"
-      />
-
-      <button
-        @click="handleLogin"
-        class="btn btn-primary w-100"
-        :disabled="loading"
-      >
-        <span v-if="loading">Entrando..</span>
-        <span v-else>Entrar</span>
-      </button>
-
-      <div class="mt-3 text-center">
-        <router-link to="/register">Criar conta</router-link> |
-        <router-link to="/forgot-password">Esqueci a senha</router-link>
-      </div>
-
-      <p v-if="errorMessage" class="text-danger text-center">
-        {{ errorMessage }}
+  <div class="page">
+    <div class="left">
+      <h1>Sistema de Agendamentos</h1>
+      <p>
+        Organize seus clientes, horários e seu caos emocional profissional em
+        um só lugar.
       </p>
     </div>
+
+    <LoginForm @submit="handleLogin" />
   </div>
 </template>
+
+<script setup>
+import LoginForm from "@/components/LoginForm.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+
+const auth = useAuthStore();
+const router = useRouter();
+
+async function handleLogin({ email, password }) {
+  await auth.login(email, password);
+  router.push("/");
+}
+</script>
+
+<style scoped>
+.page {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr 420px;
+  align-items: center;
+  padding: 0 6vw;
+  background: linear-gradient(135deg, #faf7ff, #fdfcff);
+}
+
+.left h1 {
+  font-size: 2.8rem;
+  color: #6f42c1;
+  margin-bottom: 0.8rem;
+}
+
+.left p {
+  max-width: 420px;
+  font-size: 1.05rem;
+  color: #666;
+}
+</style>
