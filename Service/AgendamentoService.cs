@@ -1,11 +1,7 @@
 using SistemaAgendamentos.Api.Dtos.Agendamentos;
 using SistemaAgendamentos.Api.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using SistemaAgendamentos.Api.Enums;
 using SistemaAgendamentos.Api.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace SistemaAgendamentos.Api.Service;
 
@@ -22,17 +18,23 @@ public class AgendamentoService
 
   public async Task<List<AgendamentoResponseDto>> GetAllAsync()
   {
-    var agendamentos = await _context.Agendamentos.ToListAsync();
+    var agendamentos = await _context.Agendamentos
+      .Include(a => a.Cliente)
+      .Include(a => a.Servico)
+      .ToListAsync();
+
     return agendamentos.Select(MapToResponse).ToList();
   }
 
-
   public async Task<AgendamentoResponseDto?> GetByIdAsync(Guid id)
   {
-    var agendamento = await _context.Agendamentos.FirstOrDefaultAsync(a => a.Id == id);
+    var agendamento = await _context.Agendamentos
+      .Include(a => a.Cliente)
+      .Include(a => a.Servico)
+      .FirstOrDefaultAsync(a => a.Id == id);
+
     return agendamento == null ? null : MapToResponse(agendamento);
   }
-
 
   public async Task<AgendamentoResponseDto> CreateAsync(CreateAgendamentoDto dto)
   {
@@ -97,7 +99,9 @@ public class AgendamentoService
     {
       Id = a.Id,
       ClienteId = a.ClienteId,
+      ClienteNome = a.Cliente.Nome,
       ServicoId = a.ServicoId,
+      ServicoNome = a.Servico.Nome,
       DataHora = a.DataHora,
       Status = a.Status,
       CreatedAt = a.CreatedAt

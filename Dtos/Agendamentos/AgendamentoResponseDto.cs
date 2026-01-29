@@ -6,8 +6,11 @@ public class AgendamentoResponseDto
 {
   public Guid Id { get; set; }
   public Guid ClienteId { get; set; }
+  public string ClienteNome { get; set; } = null!;
   public Guid ServicoId { get; set; }
+  public string ServicoNome { get; set; } = null!;
   public DateTime DataHora { get; set; }
   public StatusAgendamento Status { get; set; }
   public DateTime CreatedAt { get; set; }
 }
+
