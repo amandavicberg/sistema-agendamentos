@@ -1,3 +1,17 @@
+<script setup>
+import LoginForm from "@/components/auth/LoginForm.vue";
+import { useAuthStore } from "@/stores/auth";
+import { useRouter } from "vue-router";
+
+const auth = useAuthStore();
+const router = useRouter();
+
+async function handleLogin({ email, password }) {
+  await auth.login(email, password);
+  router.push("/");
+}
+</script>
+
 <template>
   <div class="page">
     <div class="left">
@@ -11,20 +25,6 @@
     <LoginForm @submit="handleLogin" />
   </div>
 </template>
-
-<script setup>
-import LoginForm from "@/components/LoginForm.vue";
-import { useAuthStore } from "@/stores/auth";
-import { useRouter } from "vue-router";
-
-const auth = useAuthStore();
-const router = useRouter();
-
-async function handleLogin({ email, password }) {
-  await auth.login(email, password);
-  router.push("/");
-}
-</script>
 
 <style scoped>
 .page {

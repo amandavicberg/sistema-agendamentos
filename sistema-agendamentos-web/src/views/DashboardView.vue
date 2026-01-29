@@ -1,38 +1,52 @@
 <script setup>
-import DashboardCard from "@/components/DashboardCard.vue";
+import { ref, onMounted } from "vue";
+import { getAppointments } from "@/api/appointment";
+import NewAppointment from "@/components/appointments/NewAppointment.vue";
+
+const appointments = ref([]);
+const loading = ref(true);
+
+const loadAppointments = async () => {
+  loading.value = true;
+  appointments.value = await getAppointment();
+  loading.value = false;
+};
+
+onMounted(loadAppointments);
 </script>
 
 <template>
   <div class="container py-4">
-    <h2 class="fw-bold mb-4">Dashboard ✨</h2>
-
-    <div class="row g-4">
-      <div class="col-md-4">
-        <DashboardCard
-          title="Agendamentos hoje"
-          value="12"
-          icon="bi bi-calendar-check"
-          color="primary"
-        />
-      </div>
-
-      <div class="col-md-4">
-        <DashboardCard
-          title="Clientes ativos"
-          value="87"
-          icon="bi bi-people"
-          color="success"
-        />
-      </div>
-
-      <div class="col-md-4">
-        <DashboardCard
-          title="Faturamento do mês"
-          value="R$ 4.280"
-          icon="bi bi-cash-stack"
-          color="pink"
-        />
-      </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>📅 Appointments</h2>
+      <NewAppointment @saved="loadAppointments" />
     </div>
+
+    <p v-if="loading">Loading appointments...</p>
+
+    <p v-else-if="appointments.length === 0">
+      ✨ No appointments yet. Create your first one.
+    </p>
+
+    <table v-else class="table table-hover align-middle">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Client</th>
+          <th>Service</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="a in appointments" :key="a.id">
+          <td>{{ new Date(a.dataHora).toLocaleString() }}</td>
+          <td>
+            <span class="badge bg-secondary">{{ a.status }}</span>
+          </td>
+          <td>{{ a.clienteNome }}</td>
+          <td>{{ a.servicoNome }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>

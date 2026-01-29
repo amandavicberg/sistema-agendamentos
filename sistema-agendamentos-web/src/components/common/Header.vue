@@ -5,6 +5,8 @@
     <nav class="nav">
       <RouterLink to="/login" class="link">Entrar</RouterLink>
       <RouterLink to="/register" class="btn">Cadastrar</RouterLink>
+      <router-link to="/clients" class="nav-link">Clientes</router-link>
+      <router-link to="/services" class="nav-link">Serviços</router-link>
     </nav>
   </header>
 </template>

@@ -1,3 +1,29 @@
+<script setup>
+import { ref } from "vue";
+import AlertMessage from "@/components/common/AlertMessage.vue";
+import LoadingButton from "@/components/common/LoadingButton.vue";
+
+const emit = defineEmits(["submit"]);
+
+const email = ref("");
+const password = ref("");
+const error = ref("");
+const loading = ref(false);
+
+async function submit() {
+  loading.value = true;
+  error.value = "";
+
+  try {
+    emit("submit", { email: email.value, password: password.value });
+  } catch (err) {
+    error.value = "Erro ao tentar login";
+  } finally {
+    loading.value = false;
+  }
+}
+</script>
+
 <template>
   <form @submit.prevent="submit" class="card">
     <h2>Entrar</h2>
@@ -25,32 +51,6 @@
     </p>
   </form>
 </template>
-
-<script setup>
-import { ref } from "vue";
-import AlertMessage from "@/components/AlertMessage.vue";
-import LoadingButton from "@/components/LoadingButton.vue";
-
-const emit = defineEmits(["submit"]);
-
-const email = ref("");
-const password = ref("");
-const error = ref("");
-const loading = ref(false);
-
-async function submit() {
-  loading.value = true;
-  error.value = "";
-
-  try {
-    emit("submit", { email: email.value, password: password.value });
-  } catch (err) {
-    error.value = "Erro ao tentar login";
-  } finally {
-    loading.value = false;
-  }
-}
-</script>
 
 <style scoped>
 .card {
