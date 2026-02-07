@@ -1,41 +1,43 @@
 <script setup>
 import { ref, onMounted } from "vue";
-import { getServices, createServices } from "@/api/service";
+import { getServices, createServices } from "@/api/service.js";
 import NewService from "@/components/services/NewService.vue";
 
 const servicos = ref([]);
-const showModal = ref(false);
-const loading = ref(true);
+const showNewModal = ref(false);
+const modalErrors = ref([]);
 
 const loadServicos = async () => {
-  loading.value = true;
-  servicos.value = await getServicos();
-  loading.value = false;
+  servicos.value = await getServices();
 };
 
 onMounted(loadServicos);
 
 async function salvarServico(payload) {
-  await createServico(payload);
-  showModal.value = false;
-  loadServicos();
+  try {
+    await createService(payload);
+    showNewModal.value = false;
+    modalErrors.value = [];
+    loadServicos();
+  } catch (err) {
+    const apiErrors = err.response?.data?.errors;
+    modalErrors.value = apiErrors
+      ? Object.values(apiErrors).flat()
+      : ["Erro ao cadastrar serviço"];
+  }
 }
 </script>
 
 <template>
   <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h2>💜 Services</h2>
-      <button class="btn btn-primary" @click="showModal = true">
+      <h2>💖 Services</h2>
+      <button class="btn btn-primary" @click="showNewModal = true">
         + New Service
       </button>
     </div>
 
-    <p v-if="loading">Loading services...</p>
-
-    <p v-else-if="servicos.length === 0">
-      ✨ No services yet.
-    </p>
+    <p v-if="servicos.length === 0">✨ No services yet.</p>
 
     <table v-else class="table table-hover">
       <thead>
@@ -55,8 +57,9 @@ async function salvarServico(payload) {
     </table>
 
     <NewService
-      v-if="showModal"
-      @close="showModal = false"
+      v-if="showNewModal"
+      :errors="modalErrors"
+      @close="showNewModal = false"
       @saved="salvarServico"
     />
   </div>

@@ -4,9 +4,11 @@ import RegisterView from "@/views/RegisterView.vue";
 import ServicesView from "@/views/ServicesView.vue";
 import { createRouter, createWebHistory } from "vue-router";
 import DashboardView from "../views/DashboardView.vue";
+import LandingView from '@/views/LandingView.vue'
 
 const routes = [
-  { path: "/", redirect: "/login" },
+  { path: "/", redirect: "/landing" },
+  { path: '/landing', component: LandingView },
   { path: "/login", component: LoginView },
   { path: "/register", component: RegisterView },
   { path: "/dashboard", component: DashboardView },

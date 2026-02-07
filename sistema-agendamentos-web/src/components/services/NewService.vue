@@ -1,6 +1,13 @@
 <script setup>
 import { ref } from "vue";
 
+const props = defineProps({
+  errors: {
+    type: Array,
+    default: () => [],
+  },
+});
+
 const emit = defineEmits(["close", "saved"]);
 
 const nome = ref("");
@@ -21,9 +28,13 @@ function salvar() {
     <div class="modal-card">
       <h5 class="mb-3">💖 New Service</h5>
 
-      <input v-model="nome" class="form-control mb-2" placeholder="Service name" />
-      <input v-model="preco" type="number" class="form-control mb-2" placeholder="Price" />
-      <input v-model="duracaoMinutos" type="number" class="form-control mb-4" placeholder="Duration (minutes)" />
+      <input v-model="nome" class="form-control mb-2" placeholder="Name" />
+      <input v-model="preco" class="form-control mb-2" placeholder="Price" />
+      <input v-model="duracaoMinutos" class="form-control mb-2" placeholder="Duration (minutes)" />
+
+      <ul v-if="errors?.length" class="text-danger mb-3">
+        <li v-for="(e, i) in errors" :key="i">{{ e }}</li>
+      </ul>
 
       <div class="d-flex justify-content-end gap-2">
         <button class="btn btn-outline-secondary" @click="$emit('close')">
@@ -36,22 +47,3 @@ function salvar() {
     </div>
   </div>
 </template>
-
-<style scoped>
-.modal-backdrop-custom {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-}
-
-.modal-card {
-  background: white;
-  padding: 1.5rem;
-  border-radius: 16px;
-  width: 380px;
-}
-</style>
